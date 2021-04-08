@@ -8,6 +8,8 @@
 <h2>Your Profile </h2>
 {% if user.user_profile %}
     <img src="{{user.user_profile.profile_pic.url}}" class="rounded-circle" alt="" width="120px">
+    <br><br>
+    <a href="{% url 'App_Login:change_pro_pic' %}" class="btn btn-info btn-sm">Change Profie Pic</a>
 {% else %}
     <img src="/media/default.jpg" class="rounded-circle" alt="" width="120px">
     <br> 

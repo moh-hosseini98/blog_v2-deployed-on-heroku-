@@ -4,7 +4,7 @@ from django.contrib.auth import login,logout,authenticate
 from django.urls import reverse
 from django.contrib.auth.decorators import login_required
 from .forms import SignupForm,UserProfileChange,ProfilePic
-
+from django.conf import settings
 
 
 def sign_up(request):
@@ -41,16 +41,16 @@ def login_page(request):
 
     return render(request,'App_Login/login.htm',context) 
 
-@login_required
+@login_required(login_url=settings.LOGIN_URL)
 def logout_user(request):
     logout(request)
     return HttpResponseRedirect(reverse('App_Login:sign_in'))              
 
-@login_required
+@login_required(login_url=settings.LOGIN_URL)
 def profile(request):
     return render(request,'App_Login/profile.htm')
 
-@login_required
+@login_required(login_url=settings.LOGIN_URL)
 def user_change(request):
     current_user = request.user
     form = UserProfileChange(instance=current_user)
@@ -65,7 +65,7 @@ def user_change(request):
     }
     return render(request,'App_Login/change_profile.htm',context)        
       
-@login_required
+@login_required(login_url=settings.LOGIN_URL)
 def pass_change(request):
     current_user = request.user
     change = False
@@ -84,7 +84,7 @@ def pass_change(request):
 
 
 
-@login_required
+@login_required(login_url=settings.LOGIN_URL)
 def add_pro_pic(request):
     form = ProfilePic()
 
@@ -104,3 +104,19 @@ def add_pro_pic(request):
 
 
     return render(request,'App_Login/pro_pic_add.htm',context)
+
+@login_required(login_url=settings.LOGIN_URL)
+def change_pro_pic(request):
+    form = ProfilePic(instance=request.user.user_profile)
+    if request.method == 'POST':
+        form = ProfilePic(request.POST,request.FILES,instance=request.user.user_profile)
+        if form.is_valid():
+            form.save()
+            return HttpResponseRedirect(reverse('App_Login:profile'))
+
+    context = {
+        'form':form
+    }    
+
+    return render(request,'App_Login/pro_pic_add.htm',context)
+    

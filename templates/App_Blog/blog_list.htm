@@ -17,6 +17,12 @@
         <p>{{ blog.blog_content|range_filter|linebreaks }}</p>
         <a href="{% url 'App_Blog:blog_details' slug=blog.slug %}">Read More</a>
         <h6>Posted By: <a href="#">{{blog.author}}</a></h6>
+        {% if blog.author.user_profile %}
+        <img src="{{blog.author.user_profile.profile_pic.url}}" class="rounded-circle" alt="" width="40px">
+        {% else %}
+        <img src="/media/default.jpg" class="rounded-circle" alt="" width="40px">
+        {% endif %}
+        <br><br>
         <h6>{{ blog.liked_blog.count }} Likes | {{ blog.blog_comment.count }} comments</h6>
     </div>
     
