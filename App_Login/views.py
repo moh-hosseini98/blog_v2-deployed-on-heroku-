@@ -1,16 +1,17 @@
 from django.shortcuts import render,HttpResponseRedirect
-from django.contrib.auth.forms import UserCreationForm,AuthenticationForm
+from django.contrib.auth.forms import UserCreationForm,AuthenticationForm,PasswordChangeForm
 from django.contrib.auth import login,logout,authenticate
 from django.urls import reverse
 from django.contrib.auth.decorators import login_required
+from .forms import SignupForm,UserProfileChange
 
 
 
 def sign_up(request):
-    form = UserCreationForm()
+    form = SignupForm()
     registered = False
     if request.method == 'POST':
-        form = UserCreationForm(data=request.POST)
+        form = SignupForm(data=request.POST)
         if form.is_valid():
             form.save() 
             registered = True
@@ -45,3 +46,38 @@ def logout_user(request):
     logout(request)
     return HttpResponseRedirect(reverse('App_Login:sign_in'))              
 
+@login_required
+def profile(request):
+    return render(request,'App_Login/profile.htm')
+
+@login_required
+def user_change(request):
+    current_user = request.user
+    form = UserProfileChange(instance=current_user)
+    if request.method == 'POST':
+        form = UserProfileChange(request.POST,instance=current_user)
+        if form.is_valid():
+            form.save()
+            form = UserProfileChange(instance=current_user)
+            
+    context = {
+        'form':form
+    }
+    return render(request,'App_Login/change_profile.htm',context)        
+      
+@login_required
+def pass_change(request):
+    current_user = request.user
+    change = False
+    form = PasswordChangeForm(current_user)
+    if request.method == 'POST':
+        form = PasswordChangeForm(current_user,data=request.POST)
+        if form.is_valid():
+            form.save()
+            change=True
+    context = {
+        'form':form,
+        'change':change
+    }        
+
+    return render(request,'App_Login/pass_change.htm',context)        
