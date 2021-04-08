@@ -3,7 +3,7 @@ from django.contrib.auth.forms import UserCreationForm,AuthenticationForm,Passwo
 from django.contrib.auth import login,logout,authenticate
 from django.urls import reverse
 from django.contrib.auth.decorators import login_required
-from .forms import SignupForm,UserProfileChange
+from .forms import SignupForm,UserProfileChange,ProfilePic
 
 
 
@@ -81,3 +81,26 @@ def pass_change(request):
     }        
 
     return render(request,'App_Login/pass_change.htm',context)        
+
+
+
+@login_required
+def add_pro_pic(request):
+    form = ProfilePic()
+
+    if request.method == 'POST':
+        form = ProfilePic(request.POST,request.FILES)
+        if form.is_valid():
+            user_obj = form.save(commit=False)
+            user_obj.user = request.user
+            user_obj.save()
+            return HttpResponseRedirect(reverse('App_Login:profile'))
+
+    context = {
+        'form':form
+    }        
+
+
+
+
+    return render(request,'App_Login/pro_pic_add.htm',context)
