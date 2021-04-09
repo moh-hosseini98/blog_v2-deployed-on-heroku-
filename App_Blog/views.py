@@ -8,6 +8,9 @@ from .forms import CommentForm
 from django.contrib.auth.decorators import login_required
 from django.conf import settings
 
+from django.core.exceptions import ObjectDoesNotExist
+
+
 def blog_list(request):
     return render(request,'App_Blog/blog_list.htm')
 
@@ -44,7 +47,11 @@ class BlogList(generic.ListView):
 
 @login_required(login_url=settings.LOGIN_URL)
 def blog_details(request,slug):
-    blog = Blog.objects.get(slug=slug)
+    try:
+        blog = Blog.objects.get(slug=slug)
+    except ObjectDoesNotExist:
+        return render(request,'404.html')    
+        
     comment_form = CommentForm()
     already_liked = Likes.objects.filter(blog=blog,user=request.user)
 
